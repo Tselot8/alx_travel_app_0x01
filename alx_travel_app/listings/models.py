@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.utils import timezone
 
 class Listing(models.Model):
     name = models.CharField(max_length=255)
@@ -36,3 +38,14 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.listing.name} ({self.rating})"
+    
+class Payment(models.Model):
+    booking = models.ForeignKey("Booking", on_delete=models.CASCADE, related_name="payments")
+    transaction_id = models.CharField(max_length=255, unique=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=50, default="Pending")  # Pending, Completed, Failed
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.booking} - {self.status}"
